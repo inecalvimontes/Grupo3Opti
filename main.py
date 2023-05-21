@@ -25,7 +25,7 @@ g =
 s =
 N = 
 Co = [randint(10000, 100000) for i in A]
-
+v =
 
 # Coloque aca sus variables
 x = m.addVars(A, A, vtype=GRB.BINARY, name='x_ab')
@@ -63,9 +63,8 @@ numerador = quicksum((w[i]*c[i]) for i in I)
 m.addConstr(numerador == denominador * (0.9 + z2), name='R8')
 
 m.update()
-objetivo = b1*z1 + b2*z2 - p * quicksum((t[i, j] - alpha)*x[i, j] for i in I
-                                        for j in J if t[i, j] > alpha)
-m.setObjective(objetivo, GRB.MAXIMIZE)  # Colocar la FO
+objetivo = quicksum(y[a][c] + (n[c] * z[c]) - u[a][c] for a in A for c in Ca)
+m.setObjective(objetivo, GRB.MINIMIZE)  # Colocar la FO
 m.optimize()
 
 # Solución óptima
