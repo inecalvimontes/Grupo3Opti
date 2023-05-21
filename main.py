@@ -1,55 +1,53 @@
 from gurobipy import GRB, Model, quicksum
 from random import randint, seed, uniform
 
-seed(10)
+seed(30)
 m = Model()
 
 # SETS
 Ca = range(10)  # Construcciones
 A = range(8)  # Localizaciones
-
+T = range(24)
 # PARAMS
-p = 
+p = [randint(1, 10) for c in Ca]
 k = 
-R = 
-m = [randint(0, 1000) for i in Ca]
-Cmax = 20000
-h = [uniform(0, 1) for i in A]
-f = 0.1
-t = 
+m = [randint(0, 1000) for c in Ca]
+h = [uniform(0, 1) for a in A]
+z =   
 d = 2
-D = 
-z =
-J = 200000
-g =
-s =
-N = 
+J = 100000
 Co = [randint(10000, 100000) for i in A]
-v =
+alpha = 0.8
+s = 
+N = [uniform(0, 1) for a in A]
 
 # Coloque aca sus variables
-x = m.addVars(A, A, vtype=GRB.BINARY, name='x_ab')
+x = m.addVars(A, Ca, T, vtype=GRB.BINARY, name='x_act')
+g = m.addVars(A, Ca, T, vtype=GRB.BINARY, name='g_act')
 y = m.addVars(A, Ca, vtype=GRB.CONTINUOUS, name='y_ac')
 u = m.addVars(A, Ca, vtype=GRB.CONTINUOUS, name='u_ac')
-v = m.addVars(A, vtype=GRB.CONTINUOUS, name='v_a')
-n = m.addVar(Ca, vtype=GRB.BINARY, name='n_c')
-w = m.addVar(A, vtype=GRB.BINARY, name='w_a')
+n = m.addVars(Ca, vtype=GRB.BINARY, name='n_c')
+w = m.addVars(A, Ca, vtype=GRB.BINARY, name='w_ac')
+Cal = m.addVars(T, Ca, vtype=GRB.CONTINUOUS, name='Cal_tc')
+M = m.addVars(T, vtype=GRB.CONTINUOUS, name='M_t')
+r = m.addVars(A, Ca, T, vtype=GRB.BINARY, name='r_act')
 m.update()
 # Coloque aca sus restricciones
-# (1): 
-m.addConstrs((quicksum(u[a, c] for a in A) <= m[c] for c in Ca), name='R1')
+# (1) La cantidad de agua reciclada debe ser menor a la capacidad del estanque:
+m.addConstrs((M[t, c] <= m[c] for t in T for c in Ca), name='R1')
 
-# (2): 
-m.addConstrs((y[a, c] >= k[a] * p[c] for a in A for c in Ca), name='R2')
+# (2)La cantidad de agua almacenada en el estanque en el periodo t (inventario): 
+m.addConstrs((M[t, c] == M[t-1, c] + quicksum(x[a, c, t] * k[a] for a in A)
+              - quicksum(r[a, c, t] * k[a] for a in A) for t in T for c in Ca), name='R2')
 
-# (3): 
-m.addConstr((quicksum(y[a, c] for a in A for c in Ca) <= Cmax), name='R3')
+# (3)Cantidad inicial del estanque: 
+m.addConstr((M[1, c] == 0 for c in Ca), name='R4')
 
-# (4): 
-m.addConstr((quicksum(n[c] * z[c] for c in Ca) <= f * Cmax), name='R4')
+# (4)Cada actividad cuenta con la cantidad mínima de agua necesaria:
+m.addConstr((y[a, c] >= k[a] * p[c] for a in A for c in Ca), name='R3')
 
-# (5): 
-m.addConstrs((x[a, b] * s[a] >= h[b] for a in A for b in A if a != b), name='R5')
+# (5)El agua solo se puede reciclar si tiene un grado alfa de calidad: 
+m.addConstrs((x[a, c, t] <= s[a] for a in A for c in Ca for t in T), name='R5')
 # (6): 
 m.addConstrs((abs(n[c] - 1) * J + quicksum(y[a, c] * d + w[a] * Co[a] for a in A) <= D[c] for c in Ca), name='R6')
 # (7): 
