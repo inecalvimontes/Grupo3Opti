@@ -19,10 +19,8 @@ D = [randint(5000, 6000) for c in Ca]
 d = 1.5
 J = 60000/30
 f = 0.7
-# Co randint(10000/30, 100000/30)
-Co = [randint(0, 0) for a in A]
+Co = [randint(333, 3333) for a in A]
 alpha = 0.8
 s = [0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0]
 h = [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
-N = [-10 for a in A]
-#N = [uniform(0, 1) for a in A]
+N = [uniform(0,1) for a in A]
