@@ -16,7 +16,7 @@ k = [randint(3, 20) for a in A]
 b = [randint(1, 10) for a in A]
 m = [randint(0, 1000) for c in Ca]
 z = [uniform(0, 2) for c in Ca]  
-D = [randint(1000, 2000) for c in Ca]
+D = [randint(8000, 9000) for c in Ca]
 d = 2
 J = 50000
 f = 0.7
@@ -71,6 +71,8 @@ model.addConstrs((n[c]*J + quicksum(y[a, c, t]*d + w[a, c]*Co[a] for a in A for 
 # traer una reducción del agua consumida en comparación a la tecnología anterior:
 # OJOOOOO ACAAA ARREGLAR ESTO, ESTA RARO
 model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a,c])*k[a]== y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
+model.addConstrs((y[a,c,t] + q[a,c,t]== k[a] for a in A for c in Ca for t in T), name='R9')
+
 
 # (10) Si se decide realizar mantenimiento, las fugas disminuyen en un factor f.
 model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca ), name='R10')
@@ -92,3 +94,8 @@ model.optimize()
 model.printAttr('X')
 
 print("Valor óptimo de la función objetivo: ", model.objVal)
+
+#for a in A:
+ #   for c in Ca:
+  #      for t in T:
+   #         print(y[a,c,t])
