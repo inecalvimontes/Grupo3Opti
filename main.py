@@ -1,20 +1,20 @@
 from gurobipy import GRB, Model, quicksum
 from random import randint, seed, uniform
 
-seed(30)
+seed(300000)
 model = Model()
 
 # SETS
-Ca = range(10)  # Casas
-A = range(8)  # Actividades
-T = range(1, 25)  # Horas del día
+Ca = range(1, 11)  # 10 Casas
+A = range(1, 9)  # 8 Actividades
+T = range(1, 25)  # 24 Horas del día
 # PARAMS
 MM = 10^10  # mm >> 0
 k = [randint(3, 20) for a in A]
 b = [randint(1, 10) for a in A]
 m = [randint(0, 1000) for c in Ca]
 d = 2
-z = [uniform(0, 2) for a in A]  
+z = [uniform(0, 2) for c in Ca]  
 J = 50000
 f = 0.7
 Co = [randint(10000, 100000) for a in A]
@@ -33,6 +33,7 @@ r = model.addVars(A, Ca, T, vtype=GRB.BINARY, name='r_act')
 v = model.addVars(Ca, vtype=GRB.CONTINUOUS, name='v_c')
 q = model.addVars(A, Ca, T, vtype=GRB.CONTINUOUS, name='q_act')
 model.update()
+
 # Coloque aca sus restricciones
 # (1) La cantidad de agua reciclada debe ser menor a la capacidad del estanque
 # en cada momento t:
@@ -51,7 +52,7 @@ model.addConstrs((M[1, c] == 0 for c in Ca), name='R3')
 model.addConstrs((M[t, c] >= r[a, c, t]*k[a] for a in A for c in Ca for t in T), name='R4')
 
 # (5) El agua solo se puede reciclar si tiene un grado alfa de calidad:
-model.addConstr((x[a, c, t] <= s[a] for a in A for c in Ca for t in T), name='R5')
+model.addConstrs((x[a, c, t] <= s[a] for a in A for c in Ca for t in T), name='R5')
 
 # (6) Solo se puede utilizar el agua del estanque si la actividad no requiere
 # una calidad sobre alfa para ser realizada: 
@@ -77,7 +78,7 @@ model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca
 model.addConstrs((MM*r[a, c, t] >= q[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
 model.update()
-objetivo = quicksum((y[a, c] + v[c] - x[a, c, t]*k[a]) for a in A for c in Ca for t in T)
+objetivo = quicksum((y[a, c, t] + v[c] - x[a, c, t]*k[a]) for a in A for c in Ca for t in T)
 model.setObjective(objetivo, GRB.MINIMIZE)  # Colocar la FO
 model.optimize()
 
