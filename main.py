@@ -5,22 +5,24 @@ seed(300000)
 model = Model()
 
 # SETS
-Ca = range(1, 11)  # 10 Casas
-A = range(1, 9)  # 8 Actividades
+Ca = range(10)  # 10 Casas
+A =  range(11) 
+#  ['WC', 'Ducha', 'Lavado manos', 'Lavado dientes', 'Riego', 'Beber', 'Cocina','limpieza', 'Lavado platos', 'Lavado ropa', 'Lavado auto' ]  # 11 Actividades
 T = range(1, 25)  # 24 Horas del día
 # PARAMS
-MM = 10^10  # mm >> 0
+MM = 10 ^ 10  # mm >> 0
 k = [randint(3, 20) for a in A]
 b = [randint(1, 10) for a in A]
 m = [randint(0, 1000) for c in Ca]
-d = 2
 z = [uniform(0, 2) for c in Ca]  
+D = [randint(1000, 2000) for c in Ca]
+d = 2
 J = 50000
 f = 0.7
 Co = [randint(10000, 100000) for a in A]
 alpha = 0.8
-s = [randint(0, 1) for a in A]
-h = [randint(0, 1) for a in A]
+s = [0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0]
+h = [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
 N = [uniform(0, 1) for a in A]
 # Coloque aca sus variables
 x = model.addVars(A, Ca, T, vtype=GRB.BINARY, name='x_act')
@@ -61,8 +63,8 @@ model.addConstrs((r[a, c, t] <= h[a] for a in A for c in Ca for t in T), name='R
 # (7) No se puede reciclar el agua de la actividad a si esta no se realiza:
 model.addConstrs((x[a, c, t] <= g[a, c, t] for a in A for c in Ca for t in T), name='R7')
 
-# (8):
-#m.addConstrs((), name='R8')
+# (8) La cantidad de agua utilizada por cada casa debe ser menor al presupuesto destinado por la familia:
+model.addConstrs((n[c]*J + quicksum(y[a, c, t]*d + w[a, c]*Co[a] for a in A for t in T) <= D[c] for c in Ca), name='R8')
 
 # (9) La adquisición de nuevas tecnologías para llevar a cabo una actividad debe
 # traer una reducción del agua consumida en comparación a la tecnología anterior:
@@ -86,3 +88,5 @@ model.optimize()
 model.printAttr('X')
 
 print("Valor óptimo de la función objetivo: ", model.objVal)
+
+
