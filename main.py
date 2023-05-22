@@ -43,7 +43,7 @@ model.addConstrs((r[a, c, t] <= h[a] for a in A for c in Ca for t in T), name='R
 model.addConstrs((x[a, c, t] <= g[a, c, t] for a in A for c in Ca for t in T), name='R7')
 
 # (8) La cantidad de agua utilizada por cada casa debe ser menor al presupuesto destinado por la familia:
-model.addConstrs((n[c]*J + quicksum(y[a, c, t]*d + w[a, c]*Co[a] for a in A for t in T) <= D[c] for c in Ca), name='R8')
+model.addConstrs((n[c]*J + quicksum(quicksum(y[a, c, t]*d for t in T) + w[a, c]*Co[a] for a in A) <= D[c] for c in Ca), name='R8')
 
 # (9) La adquisición de nuevas tecnologías para llevar a cabo una actividad debe
 # traer una reducción del agua consumida en comparación a la tecnología anterior:
@@ -60,12 +60,12 @@ model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca
 model.addConstrs((MM*r[a, c, t] >= q[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
 # (13)
-model.addConstrs((y[a,c,t] + q[a,c,t]== k[a] for a in A for c in Ca for t in T), name='R9')
+model.addConstrs((y[a,c,t] + q[a,c,t]== k[a] for a in A for c in Ca for t in T), name='R13')
 
 # model.addConstrs((q[a, c, t] >= x[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
 model.update()
-objetivo = quicksum((y[a, c, t] + v[c] - x[a, c, t]*k[a]) for a in A for c in Ca for t in T)
+objetivo = quicksum(quicksum(y[a, c, t] - x[a, c, t]*k[a] for a in A for t in T) + v[c] for c in Ca)
 model.setObjective(objetivo, GRB.MINIMIZE)  # FUNCIÓN OBJETIVO
 model.optimize()
 
@@ -73,9 +73,3 @@ model.optimize()
 model.printAttr('X')
 
 print("Valor óptimo de la función objetivo: ", model.objVal)
-
-#for a in A:
-#for c in Ca:
-    #print(n[c])
-  #      for t in T:
-   #         print(y[a,c,t])
