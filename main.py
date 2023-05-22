@@ -5,20 +5,21 @@ seed(30)
 m = Model()
 
 # SETS
-Ca = range(10)  # Construcciones
-A = range(8)  # Localizaciones
-T = range(24)
+Ca = range(10)  # Casas
+A = range(8)  # Actividades
+T = range(24) # Horas del día
 # PARAMS
-p = [randint(1, 10) for c in Ca]
-k = 
+k = [randint(3, 20) for a in A]
+b = [randint(1, 10) for a in A]
 m = [randint(0, 1000) for c in Ca]
-h = [uniform(0, 1) for a in A]
-z =   
 d = 2
-J = 100000
-Co = [randint(10000, 100000) for i in A]
+z = [uniform(0, 2) for a in A]  
+J = 50000
+f = 0.7
+Co = [randint(10000, 100000) for a in A]
 alpha = 0.8
-s = 
+s = [randint(0, 1) for a in A]
+h = [randint(0, 1) for a in A]
 N = [uniform(0, 1) for a in A]
 
 # Coloque aca sus variables
