@@ -6,10 +6,11 @@ model = Model()
 
 # SETS
 Ca = range(10)  # 10 Casas
-A =  range(11) 
+A =  range(11)  # 11 Actividades
 #  ['WC', 'Ducha', 'Lavado manos', 'Lavado dientes', 'Riego', 'Beber', 'Cocina','limpieza', 
-# 'Lavado platos', 'Lavado ropa', 'Lavado auto' ]  # 11 Actividades
+# 'Lavado platos', 'Lavado ropa', 'Lavado auto' ]  
 T = range(1, 25)  # 24 Horas del día
+
 # PARAMS
 MM = 10 ** 10  # mm >> 0
 k = [randint(3, 20) for a in A]
@@ -18,26 +19,27 @@ m = [randint(0, 1000) for c in Ca]
 z = [uniform(0, 2) for c in Ca]  
 D = [randint(8000, 9000) for c in Ca]
 d = 2
-J = 50000
+J = 5000
 f = 0.7
 Co = [randint(10000, 100000) for a in A]
 alpha = 0.8
 s = [0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0]
 h = [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
 N = [uniform(0, 1) for a in A]
-# Coloque aca sus variables
+
+# VARIABLES
 x = model.addVars(A, Ca, T, vtype=GRB.BINARY, name='x_act')
 g = model.addVars(A, Ca, T, vtype=GRB.BINARY, name='g_act')
-y = model.addVars(A, Ca, T, vtype=GRB.CONTINUOUS, name='y_act')
+y = model.addVars(A, Ca, T, vtype=GRB.CONTINUOUS, lb = 0, name='y_act')
 n = model.addVars(Ca, vtype=GRB.BINARY, name='n_c')
 w = model.addVars(A, Ca, vtype=GRB.BINARY, name='w_ac')
-M = model.addVars(T, Ca, vtype=GRB.CONTINUOUS, name='M_tc')
+M = model.addVars(T, Ca, vtype=GRB.CONTINUOUS, lb = 0, name='M_tc')
 r = model.addVars(A, Ca, T, vtype=GRB.BINARY, name='r_act')
-v = model.addVars(Ca, vtype=GRB.CONTINUOUS, name='v_c')
-q = model.addVars(A, Ca, T, vtype=GRB.CONTINUOUS, name='q_act')
+v = model.addVars(Ca, vtype=GRB.CONTINUOUS, lb = 0, name='v_c')
+q = model.addVars(A, Ca, T, vtype=GRB.CONTINUOUS, lb = 0, name='q_act')
 model.update()
 
-# Coloque aca sus restricciones
+# RESTRICCIONES
 # (1) La cantidad de agua reciclada debe ser menor a la capacidad del estanque
 # en cada momento t:
 model.addConstrs((M[t, c] <= m[c] for t in T for c in Ca), name='R1')
@@ -71,8 +73,6 @@ model.addConstrs((n[c]*J + quicksum(y[a, c, t]*d + w[a, c]*Co[a] for a in A for 
 # traer una reducción del agua consumida en comparación a la tecnología anterior:
 # OJOOOOO ACAAA ARREGLAR ESTO, ESTA RARO
 model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a,c])*k[a]== y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
-model.addConstrs((y[a,c,t] + q[a,c,t]== k[a] for a in A for c in Ca for t in T), name='R9')
-
 
 # (10) Si se decide realizar mantenimiento, las fugas disminuyen en un factor f.
 model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca ), name='R10')
@@ -83,11 +83,14 @@ model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca
 # (12) Las actividades se realizan la cantidad mínima de veces necesarias:
 model.addConstrs((MM*r[a, c, t] >= q[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
+# (13)
+model.addConstrs((y[a,c,t] + q[a,c,t]== k[a] for a in A for c in Ca for t in T), name='R9')
+
 # model.addConstrs((q[a, c, t] >= x[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
 model.update()
 objetivo = quicksum((y[a, c, t] + v[c] - x[a, c, t]*k[a]) for a in A for c in Ca for t in T)
-model.setObjective(objetivo, GRB.MINIMIZE)  # Colocar la FO
+model.setObjective(objetivo, GRB.MINIMIZE)  # FUNCIÓN OBJETIVO
 model.optimize()
 
 # Solución óptima
@@ -96,6 +99,7 @@ model.printAttr('X')
 print("Valor óptimo de la función objetivo: ", model.objVal)
 
 #for a in A:
- #   for c in Ca:
+#for c in Ca:
+    #print(n[c])
   #      for t in T:
    #         print(y[a,c,t])
