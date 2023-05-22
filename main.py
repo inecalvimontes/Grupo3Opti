@@ -80,6 +80,8 @@ model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca
 # (12) Las actividades se realizan la cantidad mínima de veces necesarias:
 model.addConstrs((MM*r[a, c, t] >= q[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
+# model.addConstrs((q[a, c, t] >= x[a, c, t] for a in A for c in Ca for t in T), name='R12')
+
 model.update()
 objetivo = quicksum((y[a, c, t] + v[c] - x[a, c, t]*k[a]) for a in A for c in Ca for t in T)
 model.setObjective(objetivo, GRB.MINIMIZE)  # Colocar la FO
