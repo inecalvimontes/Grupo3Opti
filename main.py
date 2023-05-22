@@ -10,7 +10,7 @@ A =  range(11)
 #  ['WC', 'Ducha', 'Lavado manos', 'Lavado dientes', 'Riego', 'Beber', 'Cocina','limpieza', 'Lavado platos', 'Lavado ropa', 'Lavado auto' ]  # 11 Actividades
 T = range(1, 25)  # 24 Horas del día
 # PARAMS
-MM = 10 ^ 10  # mm >> 0
+MM = 10 ** 10  # mm >> 0
 k = [randint(3, 20) for a in A]
 b = [randint(1, 10) for a in A]
 m = [randint(0, 1000) for c in Ca]
