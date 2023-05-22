@@ -70,7 +70,10 @@ model.addConstrs((n[c]*J + quicksum(y[a, c, t]*d + w[a, c]*Co[a] for a in A for 
 # (9) La adquisición de nuevas tecnologías para llevar a cabo una actividad debe
 # traer una reducción del agua consumida en comparación a la tecnología anterior:
 # OJOOOOO ACAAA ARREGLAR ESTO, ESTA RARO
-model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a,c])*k[a]== y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
+#model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a,c])*k[a]== y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
+#model.addConstrs((k[a]== y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
+model.addConstrs((q[a,c,t]>= x[a, c, t] for a in A for c in Ca for t in T), name='R9')
+
 
 # (10) Si se decide realizar mantenimiento, las fugas disminuyen en un factor f.
 model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca ), name='R10')
@@ -92,3 +95,4 @@ model.optimize()
 model.printAttr('X')
 
 print("Valor óptimo de la función objetivo: ", model.objVal)
+

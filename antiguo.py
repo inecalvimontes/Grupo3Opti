@@ -1,1 +1,0 @@
-# podemos pasar a gurobi el modelo antiguo como back up
