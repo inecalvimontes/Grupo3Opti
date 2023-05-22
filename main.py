@@ -1,31 +1,7 @@
 from gurobipy import GRB, Model, quicksum
-from random import randint, seed, uniform
+from datos import Ca, A, T, MM, k, b, m, z, D, d, J, f, Co, alpha, s, h, N
 
-seed(300000)
 model = Model()
-
-# SETS
-Ca = range(10)  # 10 Casas
-A =  range(11)  # 11 Actividades
-#  ['WC', 'Ducha', 'Lavado manos', 'Lavado dientes', 'Riego', 'Beber', 'Cocina','limpieza', 
-# 'Lavado platos', 'Lavado ropa', 'Lavado auto' ]  
-T = range(1, 25)  # 24 Horas del día
-
-# PARAMS
-MM = 10 ** 10  # mm >> 0
-k = [randint(3, 20) for a in A]
-b = [randint(1, 10) for a in A]
-m = [randint(0, 1000) for c in Ca]
-z = [uniform(0, 2) for c in Ca]  
-D = [randint(8000, 9000) for c in Ca]
-d = 2
-J = 5000
-f = 0.7
-Co = [randint(10000, 100000) for a in A]
-alpha = 0.8
-s = [0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0]
-h = [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
-N = [uniform(0, 1) for a in A]
 
 # VARIABLES
 x = model.addVars(A, Ca, T, vtype=GRB.BINARY, name='x_act')
