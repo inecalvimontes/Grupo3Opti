@@ -25,7 +25,7 @@ model.addConstrs((M[t, c] == M[t-1, c] + quicksum(x[a, c, t]*k[a] for a in A)
                  - quicksum(r[a, c, t]*k[a] for a in A) for t in T for c in
                  Ca if t >= 2), name='R2')
 
-# (3)Cantidad inicial del estanque: 
+# (3)Cantidad inicial del estanque:
 model.addConstrs((M[1, c] == 0 for c in Ca), name='R3')
 
 # (4) No se puede realizar la actividad a con agua reciclada del estanque si
@@ -48,10 +48,10 @@ model.addConstrs((n[c]*J + quicksum(quicksum(y[a, c, t]*d for t in T) + w[a, c]*
 # (9) La adquisición de nuevas tecnologías para llevar a cabo una actividad debe
 # traer una reducción del agua consumida en comparación a la tecnología anterior:
 
-model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a,c])*k[a]== y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
+model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a, c])*k[a] == y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
 
 # (10) Si se decide realizar mantenimiento, las fugas disminuyen en un factor f.
-model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca ), name='R10')
+model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca), name='R10')
 
 # (11) Las actividades se realizan la cantidad mínima de veces necesarias:
 model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca), name='R11')
@@ -68,3 +68,5 @@ model.optimize()
 model.printAttr('X')
 
 print("Valor óptimo de la función objetivo: ", model.objVal)
+for c in Ca:
+    print(f'n[{c+1}] =',int(n[c].X))
