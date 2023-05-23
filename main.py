@@ -6,13 +6,13 @@ model = Model()
 # VARIABLES
 x = model.addVars(A, Ca, T, vtype=GRB.BINARY, name='x_act')
 g = model.addVars(A, Ca, T, vtype=GRB.BINARY, name='g_act')
-y = model.addVars(A, Ca, T, vtype=GRB.CONTINUOUS, lb = 0, name='y_act')
+y = model.addVars(A, Ca, T, vtype=GRB.CONTINUOUS, lb=0, name='y_act')
 n = model.addVars(Ca, vtype=GRB.BINARY, name='n_c')
 w = model.addVars(A, Ca, vtype=GRB.BINARY, name='w_ac')
-M = model.addVars(T, Ca, vtype=GRB.CONTINUOUS, lb = 0, name='M_tc')
+M = model.addVars(T, Ca, vtype=GRB.CONTINUOUS, lb=0, name='M_tc')
 r = model.addVars(A, Ca, T, vtype=GRB.BINARY, name='r_act')
-v = model.addVars(Ca, vtype=GRB.CONTINUOUS, lb = 0, name='v_c')
-q = model.addVars(A, Ca, T, vtype=GRB.CONTINUOUS, lb = 0, name='q_act')
+v = model.addVars(Ca, vtype=GRB.CONTINUOUS, lb=0, name='v_c')
+q = model.addVars(A, Ca, T, vtype=GRB.CONTINUOUS, lb=0, name='q_act')
 model.update()
 
 # RESTRICCIONES
@@ -47,7 +47,7 @@ model.addConstrs((n[c]*J + quicksum(quicksum(y[a, c, t]*d for t in T) + w[a, c]*
 
 # (9) La adquisición de nuevas tecnologías para llevar a cabo una actividad debe
 # traer una reducción del agua consumida en comparación a la tecnología anterior:
-# OJOOOOO ACAAA ARREGLAR ESTO, ESTA RARO
+
 model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a,c])*k[a]== y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
 
 # (10) Si se decide realizar mantenimiento, las fugas disminuyen en un factor f.
@@ -58,11 +58,6 @@ model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca
 
 # (12) Las actividades se realizan la cantidad mínima de veces necesarias:
 model.addConstrs((MM*r[a, c, t] >= q[a, c, t] for a in A for c in Ca for t in T), name='R12')
-
-# (13)
-model.addConstrs((y[a,c,t] + q[a,c,t]== k[a] for a in A for c in Ca for t in T), name='R13')
-
-# model.addConstrs((q[a, c, t] >= x[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
 model.update()
 objetivo = quicksum(quicksum(y[a, c, t] - x[a, c, t]*k[a] for a in A for t in T) + v[c] for c in Ca)
