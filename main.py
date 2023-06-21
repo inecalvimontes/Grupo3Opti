@@ -48,7 +48,7 @@ model.addConstrs((n[c]*J + quicksum(quicksum(y[a, c, t]*d for t in T) + w[a, c]*
 # (9) La adquisición de nuevas tecnologías para llevar a cabo una actividad debe
 # traer una reducción del agua consumida en comparación a la tecnología anterior:
 
-model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a, c])*k[a] == y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
+#model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a, c])*k[a] == y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
 
 # (10) Si se decide realizar mantenimiento, las fugas disminuyen en un factor f.
 model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca), name='R10')
@@ -56,8 +56,13 @@ model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca), name='R10'
 # (11) Las actividades se realizan la cantidad mínima de veces necesarias:
 model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca), name='R11')
 
+# (11.2) Las actividades se realizan la cantidad mínima de veces necesarias:
+model.addConstrs((q[a, c, t] + y[a, c, t] >= g[a, c, t]*k[a] for a in A for c in Ca for t in T), name='R11')
+
 # (12) Las actividades se realizan la cantidad mínima de veces necesarias:
 model.addConstrs((MM*r[a, c, t] >= q[a, c, t] for a in A for c in Ca for t in T), name='R12')
+
+model.addConstrs((y[a, c, t] <= MM*g[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
 model.update()
 objetivo = quicksum(quicksum(y[a, c, t] - x[a, c, t]*k[a] for a in A for t in T) + v[c] for c in Ca)
