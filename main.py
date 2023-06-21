@@ -30,7 +30,7 @@ model.addConstrs((M[1, c] == 0 for c in Ca), name='R3')
 
 # (4) No se puede realizar la actividad a con agua reciclada del estanque si
 # es que este no posee suficiente agua:
-model.addConstrs((M[t, c] >= r[a, c, t]*k[a] for a in A for c in Ca for t in T), name='R4')
+model.addConstrs((M[t - 1, c] >= r[a, c, t]*k[a] for a in A for c in Ca for t in T if t>=2), name='R4')
 
 # (5) El agua solo se puede reciclar si tiene un grado alfa de calidad:
 model.addConstrs((x[a, c, t] <= s[a] for a in A for c in Ca for t in T), name='R5')
@@ -57,15 +57,16 @@ model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca), name='R10'
 model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca), name='R11')
 
 # (11.2) Las actividades se realizan la cantidad mínima de veces necesarias:
-model.addConstrs((q[a, c, t] + y[a, c, t] >= g[a, c, t]*k[a] for a in A for c in Ca for t in T), name='R11')
+model.addConstrs((q[a, c, t] + y[a, c, t] == g[a, c, t]*k[a] for a in A for c in Ca for t in T), name='R11.2')
 
 # (12) Las actividades se realizan la cantidad mínima de veces necesarias:
 model.addConstrs((MM*r[a, c, t] >= q[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
-model.addConstrs((y[a, c, t] <= MM*g[a, c, t] for a in A for c in Ca for t in T), name='R12')
+# (13)
+model.addConstrs((y[a, c, t] <= MM*g[a, c, t] for a in A for c in Ca for t in T), name='R13')
 
 model.update()
-objetivo = quicksum(quicksum(y[a, c, t] - x[a, c, t]*k[a] for a in A for t in T) + v[c] for c in Ca)
+objetivo = quicksum(quicksum(y[a, c, t] - q[a, c, t] for a in A for t in T) + v[c] for c in Ca)
 model.setObjective(objetivo, GRB.MINIMIZE)  # FUNCIÓN OBJETIVO
 model.optimize()
 
