@@ -12,12 +12,12 @@ T = range(1, 25)  # 24 Horas del día
 # PARAMS
 # En cientos de litros
 MM = 10 ** 10  # mm >> 0
-k = [0.10, 1.5, 0.08, 0.08, 0.08, 0.02, 0.08, 0.15, 1.5, 4]
+k = [10, 150, 8, 8, 8, 2, 8, 150, 150, 400]
 b = [8, 4, 8, 8, 1, 4, 1, 8, 1, 1]
-m = [randint(1, 10) for c in Ca]
-z = [uniform(0, 0.3) for c in Ca]  
+m = [randint(100, 1000) for c in Ca]
+z = [uniform(0, 3) for c in Ca]
 D = [randint(5000, 6000) for c in Ca]
-d = 0.015 
+d = 1.5
 J = 43000
 f = 0.7
 Co = [randint(333, 3333) for a in A]
