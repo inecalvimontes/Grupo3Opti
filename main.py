@@ -68,5 +68,3 @@ model.optimize()
 model.printAttr('X')
 
 print("Valor óptimo de la función objetivo: ", model.objVal)
-for c in Ca:
-    print(f'n[{c+1}] =',int(n[c].X))
