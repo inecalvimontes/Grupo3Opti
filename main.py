@@ -73,20 +73,3 @@ model.printAttr('X')
 
 print("Valor óptimo de la función objetivo: ", model.objVal)
 
-sum_y = 0
-for a in A:
-    for c in Ca:
-        for t in T:
-            sum_y += y[a,c,t].x
-sum_q = 0
-for a in A:
-    for c in Ca:
-        for t in T:
-            sum_q += q[a,c,t].x
-print(sum_y)
-print(sum_q)
-sum_a = 0
-for a in A:
-    sum_a += k[a]*b[a]
-print(sum_a)
-
