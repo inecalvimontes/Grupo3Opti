@@ -10,7 +10,6 @@ A = range(10)  # 10 Actividades
 T = range(1, 25)  # 24 Horas del día
 
 # PARAMS
-# En cientos de litros
 MM = 10 ** 100  # mm >> 0
 k = [10, 150, 8, 8, 8, 2, 8, 150, 150, 400]
 b = [8, 4, 8, 8, 1, 4, 1, 8, 1, 0]
@@ -20,8 +19,6 @@ D = [randint(5000, 6000) for c in Ca]
 d = 1.5
 J = 43000//30
 f = 0.7
-Co = [randint(333, 3333) for a in A]
 alpha = 0.8
 s = [0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0]
 h = [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
-N = [uniform(0, 1) for a in A]

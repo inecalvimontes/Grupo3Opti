@@ -1,5 +1,5 @@
 from gurobipy import GRB, Model, quicksum
-from datos import Ca, A, T, MM, k, b, m, z, D, d, J, f, Co, alpha, s, h, N
+from datos import Ca, A, T, MM, k, b, m, z, D, d, J, f, alpha, s, h
 
 model = Model()
 
@@ -22,7 +22,7 @@ model.addConstrs((M[t, c] <= m[c] for t in T for c in Ca), name='R1')
 
 # (2)La cantidad de agua almacenada en el estanque en el periodo t (inventario):
 model.addConstrs((M[t, c] == M[t-1, c] + quicksum(x[a, c, t]*k[a] for a in A)
-                 - quicksum(r[a, c, t]*k[a] for a in A) for t in T for c in
+                 - quicksum(q[a, c, t] for a in A) for t in T for c in
                  Ca if t >= 2), name='R2')
 
 # (3)Cantidad inicial del estanque:
@@ -42,27 +42,25 @@ model.addConstrs((r[a, c, t] <= h[a] for a in A for c in Ca for t in T), name='R
 # (7) No se puede reciclar el agua de la actividad a si esta no se realiza:
 model.addConstrs((x[a, c, t] <= g[a, c, t] for a in A for c in Ca for t in T), name='R7')
 
-# (8) La cantidad de agua utilizada por cada casa debe ser menor al presupuesto destinado por la familia:
-model.addConstrs((n[c]*J + quicksum(quicksum(y[a, c, t]*d for t in T) + w[a, c]*Co[a] for a in A) <= D[c] for c in Ca), name='R8')
+# (8) La cantidad de presupuesto utilizado en mantenciones y agua por cada casa debe ser menor al 
+# presupuesto total destinado por la familia: 
+model.addConstrs((n[c]*J + quicksum(quicksum(y[a, c, t]*d for t in T) for a in A) <= D[c] for c in Ca), name='R8')
 
-# (9) La adquisición de nuevas tecnologías para llevar a cabo una actividad debe
-# traer una reducción del agua consumida en comparación a la tecnología anterior:
+# (9) Si se decide realizar mantenimiento, las fugas disminuyen en un factor f.
+model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca), name='R9')
 
-#model.addConstrs((w[a, c]*k[a]*N[a] + (1-w[a, c])*k[a] == y[a, c, t] + q[a, c, t] for a in A for c in Ca for t in T), name='R9')
+# (10) Las actividades se realizan la cantidad mínima de veces necesarias:
+model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca), name='R10')
 
-# (10) Si se decide realizar mantenimiento, las fugas disminuyen en un factor f.
-model.addConstrs((n[c]*z[c]*f + (1 - n[c])*z[c] == v[c] for c in Ca), name='R10')
+# (11) La suma entre el agua reciclada utilizada para una actividad y el agua de la llave utilizada 
+# para la misma, es igual a la cantidad mínima necesaria de agua para esa actividad, si es que se realiza:
+model.addConstrs((q[a, c, t] + y[a, c, t] == g[a, c, t]*k[a] for a in A for c in Ca for t in T), name='R11')
 
-# (11) Las actividades se realizan la cantidad mínima de veces necesarias:
-model.addConstrs((quicksum(g[a, c, t] for t in T) >= b[a] for a in A for c in Ca), name='R11')
-
-# (11.2) Las actividades se realizan la cantidad mínima de veces necesarias:
-model.addConstrs((q[a, c, t] + y[a, c, t] == g[a, c, t]*k[a] for a in A for c in Ca for t in T), name='R11.2')
-
-# (12) Las actividades se realizan la cantidad mínima de veces necesarias:
+# (12) Si no se utiliza agua reciclada del estanque para la actividad a, entonces el agua reciclada 
+# para esa actividad es 0:
 model.addConstrs((MM*r[a, c, t] >= q[a, c, t] for a in A for c in Ca for t in T), name='R12')
 
-# (13)
+# (13)  Si no se realiza la actividad entonces la cantidad consumida de la llave debe ser 0:
 model.addConstrs((y[a, c, t] <= MM*g[a, c, t] for a in A for c in Ca for t in T), name='R13')
 
 model.update()
