@@ -64,7 +64,7 @@ model.addConstrs((MM*r[a, c, t] >= q[a, c, t] for a in A for c in Ca for t in T)
 model.addConstrs((y[a, c, t] <= MM*g[a, c, t] for a in A for c in Ca for t in T), name='R13')
 
 model.update()
-objetivo = quicksum(quicksum(y[a, c, t] - q[a, c, t] for a in A for t in T) + v[c] for c in Ca)
+objetivo = quicksum(quicksum(y[a, c, t] for a in A for t in T) + v[c] for c in Ca)
 model.setObjective(objetivo, GRB.MINIMIZE)  # FUNCIÓN OBJETIVO
 model.optimize()
 
@@ -73,3 +73,22 @@ model.printAttr('X')
 
 print("Valor óptimo de la función objetivo: ", model.objVal)
 
+sum_y = 0
+for a in A:
+    for c in Ca:
+        for t in T:
+            sum_y += y[a,c,t].x
+print(sum_y)
+
+sum_q = 0
+for a in A:
+    for c in Ca:
+        for t in T:
+            sum_q += q[a,c,t].x
+
+print(sum_q)
+
+sum_a = 0
+for a in A:
+    sum_a += k[a]*b[a]
+print(sum_a)
